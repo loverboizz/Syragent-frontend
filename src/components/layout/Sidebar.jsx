@@ -1,5 +1,5 @@
 import React from "react";
-import { LayoutDashboard, Layers, Bot, BookOpen, Users, LogOut, Sparkles, ShieldCheck, Palette, MessagesSquare } from "lucide-react";
+import { LayoutDashboard, Layers, Bot, BookOpen, Users, LogOut, Sparkles, ShieldCheck, Palette, MessagesSquare, Wrench } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 export function Sidebar({ activeTab, onSelectTab }) {
@@ -11,6 +11,7 @@ export function Sidebar({ activeTab, onSelectTab }) {
     { id: "conversations", label: "Cuộc trò chuyện", icon: MessagesSquare },
     { id: "widget", label: "Giao diện Widget", icon: Palette },
     { id: "agents", label: "Cấu hình Trợ lý AI", icon: Bot },
+    { id: "tools", label: "Công cụ & Hành động", icon: Wrench },
     { id: "knowledge", label: "Kho Tri thức & RAG", icon: BookOpen },
   ];
 

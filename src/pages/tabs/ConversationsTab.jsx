@@ -13,6 +13,8 @@ import {
   ExternalLink,
   BookOpen,
   ChevronRight,
+  ChevronDown,
+  Wrench,
   ShieldAlert,
   Check,
 } from "lucide-react";
@@ -43,6 +45,11 @@ export function ConversationsTab({ services = [], preselectedServiceId = null })
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [expandedTraces, setExpandedTraces] = useState({});
+
+  const toggleTrace = (msgId) => {
+    setExpandedTraces((prev) => ({ ...prev, [msgId]: !prev[msgId] }));
+  };
 
   const messagesEndRef = useRef(null);
 
@@ -504,6 +511,71 @@ export function ConversationsTab({ services = [], preselectedServiceId = null })
                                     );
                                   })}
                                 </div>
+                              </div>
+                            )}
+
+                            {/* ReAct Trace Ladder for Tool-Calling AI Responses */}
+                            {!isUser && msg.traces && Array.isArray(msg.traces.steps) && msg.traces.steps.length > 0 && (
+                              <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px]">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleTrace(msg.id)}
+                                  className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-sky-50/80 hover:bg-sky-100/70 border border-sky-200/70 text-sky-800 font-semibold transition-colors cursor-pointer"
+                                >
+                                  <span className="flex items-center gap-1.5">
+                                    <Wrench className="w-3.5 h-3.5 text-sky-600" />
+                                    <span>
+                                      Vết suy luận ReAct ({msg.traces.tool_calls_count || 0} lệnh gọi API • {msg.traces.total_latency_ms}ms)
+                                    </span>
+                                  </span>
+                                  {expandedTraces[msg.id] ? (
+                                    <ChevronDown className="w-3.5 h-3.5 text-sky-600" />
+                                  ) : (
+                                    <ChevronRight className="w-3.5 h-3.5 text-sky-600" />
+                                  )}
+                                </button>
+
+                                {expandedTraces[msg.id] && (
+                                  <div className="mt-2 p-2.5 rounded-xl bg-slate-900 text-slate-200 font-mono text-[10px] space-y-2 border border-slate-800">
+                                    {msg.traces.steps.map((step, sIdx) => (
+                                      <div key={sIdx} className="border-l-2 border-sky-500/60 pl-2 py-0.5">
+                                        {step.phase === "REASONING" && (
+                                          <div>
+                                            <span className="text-amber-400 font-bold">[1. THOUGHT]</span>{" "}
+                                            <span className="text-slate-300">{step.decision}</span>
+                                            {step.thought && (
+                                              <div className="text-slate-400 mt-0.5">{step.thought}</div>
+                                            )}
+                                          </div>
+                                        )}
+                                        {step.phase === "VALIDATION" && (
+                                          <div>
+                                            <span className="text-indigo-400 font-bold">[2. VALIDATION]</span>{" "}
+                                            <span>Tool: {step.tool_name}</span>{" "}
+                                            <span className={step.passed ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>
+                                              {step.passed ? "→ PASSED" : `→ FAILED (${step.error})`}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {step.phase === "TOOL_EXECUTION" && (
+                                          <div>
+                                            <span className="text-emerald-400 font-bold">[3. ACTION GATEWAY]</span>{" "}
+                                            <span>{step.method} {step.endpoint}</span>{" "}
+                                            <span className="text-sky-300">
+                                              (HTTP {step.http_status || "ERR"} • {step.latency_ms}ms)
+                                            </span>
+                                          </div>
+                                        )}
+                                        {step.phase === "RESPONSE_SYNTHESIS" && (
+                                          <div>
+                                            <span className="text-cyan-400 font-bold">[4. SYNTHESIS]</span>{" "}
+                                            <span>Tổng hợp câu trả lời qua {step.model} ({step.latency_ms}ms)</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>

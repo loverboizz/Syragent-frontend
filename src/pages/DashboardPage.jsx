@@ -6,6 +6,7 @@ import { ServicesTab } from "./tabs/ServicesTab";
 import { ConversationsTab } from "./tabs/ConversationsTab";
 import { WidgetCustomizerTab } from "./tabs/WidgetCustomizerTab";
 import { AgentConfigTab } from "./tabs/AgentConfigTab";
+import { ToolsTab } from "./tabs/ToolsTab";
 import { KnowledgeTab } from "./tabs/KnowledgeTab";
 import { UsersTab } from "./tabs/UsersTab";
 
@@ -101,6 +102,11 @@ export function DashboardPage() {
     setActiveTab("knowledge");
   };
 
+  const handleGoToTools = (serviceId) => {
+    setJumpServiceId(serviceId);
+    setActiveTab("tools");
+  };
+
   const handleGoToWidget = (serviceId) => {
     setJumpServiceId(serviceId);
     setActiveTab("widget");
@@ -150,6 +156,7 @@ export function DashboardPage() {
               onOpenEdit={handleOpenEditService}
               onOpenEmbed={handleOpenEmbedModal}
               onGoToAgent={handleGoToAgent}
+              onGoToTools={handleGoToTools}
               onGoToKnowledge={handleGoToKnowledge}
               onGoToWidget={handleGoToWidget}
               onGoToConversations={handleGoToConversations}
@@ -176,6 +183,13 @@ export function DashboardPage() {
               services={services}
               preselectedServiceId={jumpServiceId}
               onConfigSaved={() => fetchData(true)}
+            />
+          </div>
+
+          <div className={activeTab === "tools" ? "block" : "hidden"}>
+            <ToolsTab
+              services={services}
+              preselectedServiceId={jumpServiceId}
             />
           </div>
 

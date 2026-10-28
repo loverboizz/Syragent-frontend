@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Palette,
   MessagesSquare,
+  Wrench,
 } from "lucide-react";
 import { apiRequest } from "../../api/client";
 import { useToast } from "../../context/ToastContext";
@@ -26,6 +27,7 @@ export function ServicesTab({
   onOpenEdit,
   onOpenEmbed,
   onGoToAgent,
+  onGoToTools,
   onGoToKnowledge,
   onGoToWidget,
   onGoToConversations,
@@ -284,6 +286,17 @@ export function ServicesTab({
                                 >
                                   <Bot className="w-3.5 h-3.5 text-slate-400" />
                                   <span>Cấu hình Trợ lý AI</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setOpenDropdownId(null);
+                                    if (onGoToTools) onGoToTools(s.id);
+                                  }}
+                                  className="w-full px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2.5 transition-colors"
+                                >
+                                  <Wrench className="w-3.5 h-3.5 text-slate-400" />
+                                  <span>Cấu hình Công cụ (Tools)</span>
                                 </button>
                                 <button
                                   type="button"

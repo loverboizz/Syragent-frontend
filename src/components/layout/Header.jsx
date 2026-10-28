@@ -7,6 +7,7 @@ const TAB_METADATA = {
   conversations: { title: "Quản Lý Cuộc Trò Chuyện", subtitle: "Theo dõi tương tác của khách hàng, câu trả lời của AI và tài liệu trích dẫn" },
   widget: { title: "Tùy Biến Giao Diện Widget", subtitle: "Cá nhân hóa màu sắc thương hiệu, tên trợ lý, avatar và câu chào mở đầu" },
   agents: { title: "Cấu Hình Trợ Lý AI", subtitle: "Lựa chọn gói cước (FREE/BYOK), tinh chỉnh mô hình và prompt hệ thống" },
+  tools: { title: "Công Cụ & Hành Động (ReAct)", subtitle: "Cấu hình REST API ngoại vi, kiểm định JSON Schema và thử nghiệm Action Gateway" },
   knowledge: { title: "Kho Tri Thức & RAG", subtitle: "Nạp tài liệu Word, Excel, PDF và quản lý dữ liệu vector hóa" },
   users: { title: "Phân Quyền Nhân Sự", subtitle: "Danh sách quản trị viên và tài khoản vận hành phụ (Sub-Admin)" },
 };

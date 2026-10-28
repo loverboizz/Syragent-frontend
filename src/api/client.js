@@ -2,7 +2,8 @@
  * API Client & Token Management
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const RAW_API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, "");
 const TOKEN_KEY = "ai_agent_jwt_token";
 const USER_KEY = "ai_agent_user_info";
 
