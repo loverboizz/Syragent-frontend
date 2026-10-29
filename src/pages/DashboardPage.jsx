@@ -15,7 +15,7 @@ import { EmbedModal } from "../components/modals/EmbedModal";
 import { UserModal } from "../components/modals/UserModal";
 import { apiRequest } from "../api/client";
 
-export function DashboardPage() {
+export function DashboardPage({ onGoToLanding }) {
   const [activeTab, setActiveTab] = useState("overview");
 
   // Global Data Store
@@ -124,7 +124,7 @@ export function DashboardPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100/70 font-sans">
       {/* 1. Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} />
+      <Sidebar activeTab={activeTab} onSelectTab={setActiveTab} onGoToLanding={onGoToLanding} />
 
       {/* 2. Main Viewport */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">

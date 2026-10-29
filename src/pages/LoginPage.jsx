@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Sparkles, Shield, Lock, Mail, Building2, User, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Sparkles, Shield, Lock, Mail, Building2, User, ArrowRight, CheckCircle2, ArrowLeft } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 
-export function LoginPage() {
-  const [isRegister, setIsRegister] = useState(false);
+export function LoginPage({ initialRegister = false, onBack }) {
+  const [isRegister, setIsRegister] = useState(initialRegister);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -82,6 +82,17 @@ export function LoginPage() {
 
         {/* Right Side: Auth Form */}
         <div className="md:w-1/2 p-8 sm:p-12 bg-white flex flex-col justify-center">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-sky-600 mb-6 transition-colors w-fit cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>← Quay lại trang chủ</span>
+            </button>
+          )}
+
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900">
               {isRegister ? "Đăng Ký Doanh Nghiệp Mới" : "Đăng Nhập Bảng Điều Khiển"}

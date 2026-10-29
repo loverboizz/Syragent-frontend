@@ -1,8 +1,8 @@
 import React from "react";
-import { LayoutDashboard, Layers, Bot, BookOpen, Users, LogOut, Sparkles, ShieldCheck, Palette, MessagesSquare, Wrench } from "lucide-react";
+import { LayoutDashboard, Layers, Bot, BookOpen, Users, LogOut, Sparkles, ShieldCheck, Palette, MessagesSquare, Wrench, Globe } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-export function Sidebar({ activeTab, onSelectTab }) {
+export function Sidebar({ activeTab, onSelectTab, onGoToLanding }) {
   const { user, company, logout } = useAuth();
 
   const navItems = [
@@ -67,6 +67,18 @@ export function Sidebar({ activeTab, onSelectTab }) {
             </button>
           );
         })}
+
+        {onGoToLanding && (
+          <div className="pt-3 mt-3 border-t border-slate-800/80">
+            <button
+              onClick={onGoToLanding}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-sky-400 hover:text-white hover:bg-sky-500/10 border border-sky-500/20 transition-all cursor-pointer"
+            >
+              <Globe className="w-4 h-4 text-sky-400" />
+              <span>Xem Trang Chủ (Landing)</span>
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* User Profile & Logout Footer */}

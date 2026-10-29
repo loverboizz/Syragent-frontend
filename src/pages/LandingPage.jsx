@@ -172,7 +172,7 @@ const STATS = [
 ];
 
 /* ─── Main Landing Page ─── */
-export function LandingPage({ onLogin, onRegister }) {
+export function LandingPage({ onLogin, onRegister, isAuthenticated = false, onGoToDashboard }) {
   const scrollY = useScrollY();
   const [menuOpen, setMenuOpen] = useState(false);
   const [featRef, featVisible] = useInView();
@@ -210,12 +210,24 @@ export function LandingPage({ onLogin, onRegister }) {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <button onClick={onLogin} className="px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-all font-medium">
-              Đăng Nhập
-            </button>
-            <button onClick={onRegister} className="px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white rounded-xl shadow-lg shadow-sky-600/25 hover:shadow-sky-500/40 transition-all">
-              Dùng Thử Miễn Phí
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={onGoToDashboard}
+                className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white rounded-xl shadow-lg shadow-sky-600/25 hover:shadow-sky-500/40 transition-all cursor-pointer"
+              >
+                <span>Vào Bảng Quản Trị</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <>
+                <button onClick={onLogin} className="px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-all font-medium cursor-pointer">
+                  Đăng Nhập
+                </button>
+                <button onClick={onRegister} className="px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white rounded-xl shadow-lg shadow-sky-600/25 hover:shadow-sky-500/40 transition-all cursor-pointer">
+                  Dùng Thử Miễn Phí
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -233,8 +245,17 @@ export function LandingPage({ onLogin, onRegister }) {
               </button>
             ))}
             <div className="pt-2 space-y-2">
-              <button onClick={onLogin} className="w-full py-2.5 text-sm font-medium border border-slate-700 text-slate-300 rounded-xl hover:bg-slate-800 transition">Đăng Nhập</button>
-              <button onClick={onRegister} className="w-full py-2.5 text-sm font-semibold bg-gradient-to-r from-sky-600 to-cyan-500 text-white rounded-xl">Dùng Thử Miễn Phí</button>
+              {isAuthenticated ? (
+                <button onClick={onGoToDashboard} className="w-full py-2.5 text-sm font-semibold bg-gradient-to-r from-sky-600 to-cyan-500 text-white rounded-xl flex items-center justify-center gap-2">
+                  <span>Vào Bảng Quản Trị</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <>
+                  <button onClick={onLogin} className="w-full py-2.5 text-sm font-medium border border-slate-700 text-slate-300 rounded-xl hover:bg-slate-800 transition">Đăng Nhập</button>
+                  <button onClick={onRegister} className="w-full py-2.5 text-sm font-semibold bg-gradient-to-r from-sky-600 to-cyan-500 text-white rounded-xl">Dùng Thử Miễn Phí</button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -289,19 +310,31 @@ export function LandingPage({ onLogin, onRegister }) {
 
             {/* CTA buttons */}
             <div className="flex flex-wrap gap-3">
-              <button
-                onClick={onRegister}
-                className="group flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-semibold rounded-2xl shadow-xl shadow-sky-600/30 hover:shadow-sky-500/50 transition-all text-sm"
-              >
-                Bắt Đầu Miễn Phí
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button
-                onClick={onLogin}
-                className="flex items-center gap-2 px-6 py-3.5 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium rounded-2xl transition-all text-sm"
-              >
-                Đăng Nhập
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={onGoToDashboard}
+                  className="group flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-semibold rounded-2xl shadow-xl shadow-sky-600/30 hover:shadow-sky-500/50 transition-all text-sm cursor-pointer"
+                >
+                  Truy Cập Bảng Điều Khiển
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={onRegister}
+                    className="group flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-semibold rounded-2xl shadow-xl shadow-sky-600/30 hover:shadow-sky-500/50 transition-all text-sm cursor-pointer"
+                  >
+                    Bắt Đầu Miễn Phí
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button
+                    onClick={onLogin}
+                    className="flex items-center gap-2 px-6 py-3.5 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium rounded-2xl transition-all text-sm cursor-pointer"
+                  >
+                    Đăng Nhập
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Trust badges */}
@@ -451,19 +484,31 @@ export function LandingPage({ onLogin, onRegister }) {
             Tham gia ngay hôm nay, tạo dịch vụ đầu tiên và chứng kiến AI trả lời khách hàng của bạn trong vài phút.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={onRegister}
-              className="group flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold rounded-2xl shadow-2xl shadow-sky-600/30 hover:shadow-sky-500/50 transition-all text-base"
-            >
-              Tạo Tài Khoản Miễn Phí
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={onLogin}
-              className="flex items-center justify-center gap-2 px-8 py-4 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium rounded-2xl transition-all text-base"
-            >
-              Đăng Nhập Quản Trị
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={onGoToDashboard}
+                className="group flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold rounded-2xl shadow-2xl shadow-sky-600/30 hover:shadow-sky-500/50 transition-all text-base cursor-pointer"
+              >
+                Vào Bảng Quản Trị Syragent
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={onRegister}
+                  className="group flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold rounded-2xl shadow-2xl shadow-sky-600/30 hover:shadow-sky-500/50 transition-all text-base cursor-pointer"
+                >
+                  Tạo Tài Khoản Miễn Phí
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button
+                  onClick={onLogin}
+                  className="flex items-center justify-center gap-2 px-8 py-4 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium rounded-2xl transition-all text-base cursor-pointer"
+                >
+                  Đăng Nhập Quản Trị
+                </button>
+              </>
+            )}
           </div>
         </div>
       </section>

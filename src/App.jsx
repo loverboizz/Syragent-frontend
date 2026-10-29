@@ -1,12 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
+import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { Sparkles } from "lucide-react";
 
 function RootContent() {
   const { isAuthenticated, loading } = useAuth();
+  const [authMode, setAuthMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.hash === "#login") return "login";
+      if (window.location.hash === "#register") return "register";
+    }
+    return null;
+  });
+  const [viewLandingLoggedIn, setViewLandingLoggedIn] = useState(false);
 
   if (loading) {
     return (
@@ -21,7 +30,61 @@ function RootContent() {
     );
   }
 
-  return isAuthenticated ? <DashboardPage /> : <LoginPage />;
+  // 1. If user is logged in
+  if (isAuthenticated) {
+    if (viewLandingLoggedIn) {
+      return (
+        <LandingPage
+          isAuthenticated={true}
+          onGoToDashboard={() => setViewLandingLoggedIn(false)}
+          onLogin={() => setViewLandingLoggedIn(false)}
+          onRegister={() => setViewLandingLoggedIn(false)}
+        />
+      );
+    }
+    return <DashboardPage onGoToLanding={() => setViewLandingLoggedIn(true)} />;
+  }
+
+  // 2. If user is not logged in:
+  if (authMode === "login") {
+    return (
+      <LoginPage
+        initialRegister={false}
+        onBack={() => {
+          setAuthMode(null);
+          window.history.pushState(null, "", window.location.pathname);
+        }}
+      />
+    );
+  }
+
+  if (authMode === "register") {
+    return (
+      <LoginPage
+        initialRegister={true}
+        onBack={() => {
+          setAuthMode(null);
+          window.history.pushState(null, "", window.location.pathname);
+        }}
+      />
+    );
+  }
+
+  // Default for visitors: Landing Page!
+  return (
+    <LandingPage
+      isAuthenticated={false}
+      onGoToDashboard={() => setAuthMode("login")}
+      onLogin={() => {
+        setAuthMode("login");
+        window.history.pushState(null, "", "#login");
+      }}
+      onRegister={() => {
+        setAuthMode("register");
+        window.history.pushState(null, "", "#register");
+      }}
+    />
+  );
 }
 
 export default function App() {
