@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import { LandingPage } from "./pages/LandingPage";
@@ -6,16 +6,62 @@ import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { Sparkles } from "lucide-react";
 
+function getNormalizedRoute() {
+  if (typeof window === "undefined") return "/";
+  const path = window.location.pathname.toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+
+  if (path === "/dashboard" || hash === "#dashboard") return "/dashboard";
+  if (path === "/login" || hash === "#login") return "/login";
+  if (path === "/register" || hash === "#register") return "/register";
+  return "/";
+}
+
 function RootContent() {
   const { isAuthenticated, loading } = useAuth();
-  const [authMode, setAuthMode] = useState(() => {
+  const [currentRoute, setCurrentRoute] = useState(getNormalizedRoute);
+
+  // Navigate helper with clean pushState
+  const navigate = useCallback((toRoute, replace = false) => {
     if (typeof window !== "undefined") {
-      if (window.location.hash === "#login") return "login";
-      if (window.location.hash === "#register") return "register";
+      if (replace) {
+        window.history.replaceState(null, "", toRoute);
+      } else {
+        window.history.pushState(null, "", toRoute);
+      }
     }
-    return null;
-  });
-  const [viewLandingLoggedIn, setViewLandingLoggedIn] = useState(false);
+    setCurrentRoute(toRoute);
+  }, []);
+
+  // Listen for browser back / forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentRoute(getNormalizedRoute());
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  // Sync route with authentication state
+  useEffect(() => {
+    if (loading) return;
+
+    if (isAuthenticated) {
+      // If user just logged in or is logged in while viewing /login, /register, or lingering #login
+      if (
+        currentRoute === "/login" ||
+        currentRoute === "/register" ||
+        (typeof window !== "undefined" && (window.location.hash === "#login" || window.location.hash === "#register"))
+      ) {
+        navigate("/dashboard", true);
+      }
+    } else {
+      // If unauthenticated user tries to directly access /dashboard
+      if (currentRoute === "/dashboard") {
+        navigate("/login", true);
+      }
+    }
+  }, [isAuthenticated, loading, currentRoute, navigate]);
 
   if (loading) {
     return (
@@ -30,58 +76,49 @@ function RootContent() {
     );
   }
 
-  // 1. If user is logged in
-  if (isAuthenticated) {
-    if (viewLandingLoggedIn) {
-      return (
-        <LandingPage
-          isAuthenticated={true}
-          onGoToDashboard={() => setViewLandingLoggedIn(false)}
-          onLogin={() => setViewLandingLoggedIn(false)}
-          onRegister={() => setViewLandingLoggedIn(false)}
-        />
-      );
-    }
-    return <DashboardPage onGoToLanding={() => setViewLandingLoggedIn(true)} />;
+  // 1. If currently on /dashboard
+  if (isAuthenticated && currentRoute === "/dashboard") {
+    return <DashboardPage onGoToLanding={() => navigate("/")} />;
   }
 
-  // 2. If user is not logged in:
-  if (authMode === "login") {
+  // 2. If unauthenticated on /login
+  if (currentRoute === "/login") {
     return (
       <LoginPage
         initialRegister={false}
-        onBack={() => {
-          setAuthMode(null);
-          window.history.pushState(null, "", window.location.pathname);
-        }}
+        onBack={() => navigate("/")}
       />
     );
   }
 
-  if (authMode === "register") {
+  // 3. If unauthenticated on /register
+  if (currentRoute === "/register") {
     return (
       <LoginPage
         initialRegister={true}
-        onBack={() => {
-          setAuthMode(null);
-          window.history.pushState(null, "", window.location.pathname);
-        }}
+        onBack={() => navigate("/")}
       />
     );
   }
 
-  // Default for visitors: Landing Page!
+  // 4. Default: Landing Page (both for guests and for logged-in users who visit "/")
   return (
     <LandingPage
-      isAuthenticated={false}
-      onGoToDashboard={() => setAuthMode("login")}
+      isAuthenticated={isAuthenticated}
+      onGoToDashboard={() => navigate("/dashboard")}
       onLogin={() => {
-        setAuthMode("login");
-        window.history.pushState(null, "", "#login");
+        if (isAuthenticated) {
+          navigate("/dashboard");
+        } else {
+          navigate("/login");
+        }
       }}
       onRegister={() => {
-        setAuthMode("register");
-        window.history.pushState(null, "", "#register");
+        if (isAuthenticated) {
+          navigate("/dashboard");
+        } else {
+          navigate("/register");
+        }
       }}
     />
   );
