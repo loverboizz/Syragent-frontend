@@ -20,6 +20,9 @@ import { useToast } from "../../context/ToastContext";
 import { ToolModal } from "../../components/modals/ToolModal";
 import { ToolTestModal } from "../../components/modals/ToolTestModal";
 
+const BACKEND_BASE =
+  import.meta.env.VITE_API_BASE_URL || "https://syragent-backend.onrender.com";
+
 const SAMPLE_TOOLS_LIST = [
   {
     id: "lookup_order",
@@ -32,7 +35,7 @@ const SAMPLE_TOOLS_LIST = [
       description:
         "Tra cứu trạng thái đơn hàng, đơn vị vận chuyển và thời gian giao hàng dự kiến khi khách cung cấp mã đơn hàng.",
       http_method: "GET",
-      endpoint_url: "http://127.0.0.1:8000/api/v1/sandbox/orders/{order_id}",
+      endpoint_url: `${BACKEND_BASE}/api/v1/sandbox/orders/{order_id}`,
       action_type: "SYNC",
       is_active: true,
       parameters_schema: {
@@ -58,7 +61,7 @@ const SAMPLE_TOOLS_LIST = [
       description:
         "Kiểm tra số lượng tồn kho, chi nhánh còn hàng và giá bán hiện tại của sản phẩm theo tên hoặc mã SKU.",
       http_method: "GET",
-      endpoint_url: "http://127.0.0.1:8000/api/v1/sandbox/inventory/search",
+      endpoint_url: `${BACKEND_BASE}/api/v1/sandbox/inventory/search`,
       action_type: "SYNC",
       is_active: true,
       parameters_schema: {
@@ -84,7 +87,7 @@ const SAMPLE_TOOLS_LIST = [
       description:
         "Tạo phiếu yêu cầu hoàn tiền, đổi trả hoặc bảo hành cần nhân viên phê duyệt khi khách hàng khiếu nại.",
       http_method: "POST",
-      endpoint_url: "http://127.0.0.1:8000/api/v1/sandbox/tickets/create",
+      endpoint_url: `${BACKEND_BASE}/api/v1/sandbox/tickets/create`,
       action_type: "ASYNC_TICKET",
       is_active: true,
       parameters_schema: {

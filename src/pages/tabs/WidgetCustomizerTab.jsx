@@ -144,8 +144,12 @@ export function WidgetCustomizerTab({ services = [], preselectedServiceId, onCon
     }
   };
 
-  const scriptCode = `<script src="http://localhost:8000/widget.js" data-service="${selectedService?.code || "your-service-code"
-    }"></script>`;
+  const backendBase =
+    import.meta.env.VITE_API_BASE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "");
+  const scriptCode = `<script src="${backendBase}/widget.js" data-service="${
+    selectedService?.code || "your-service-code"
+  }"></script>`;
 
   const handleCopyScript = () => {
     navigator.clipboard.writeText(scriptCode);

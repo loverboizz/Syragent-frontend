@@ -9,7 +9,9 @@ export function EmbedModal({ isOpen, onClose, service }) {
 
   if (!isOpen || !service) return null;
 
-  const scriptTag = `<!-- AI Service Agent Embeddable Chat Widget -->\n<script src="${API_BASE_URL}/widget.js" data-service="${service.code}"></script>`;
+  const backendUrl =
+    API_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "");
+  const scriptTag = `<!-- AI Service Agent Embeddable Chat Widget -->\n<script src="${backendUrl}/widget.js" data-service="${service.code}"></script>`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(scriptTag);
