@@ -171,7 +171,8 @@ export function ServicesTab({
                 </tr>
               ) : (
                 filteredServices.map((s) => {
-                  const tier = s.agent ? s.agent.ai_tier : "Chưa có";
+                  const rawModel = s.agent?.model_name || "";
+                  const cleanModel = rawModel.replace(/^models\//, "");
                   const isDropdownOpen = openDropdownId === s.id;
 
                   return (
@@ -187,13 +188,9 @@ export function ServicesTab({
                         {s.service_url}
                       </td>
                       <td className="px-6 py-4">
-                        {tier === "FREE" ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            FREE (Gemini Flash)
-                          </span>
-                        ) : tier === "BYOK" ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            BYOK ({s.agent?.model_name || "Custom"})
+                        {s.agent ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                            {cleanModel || "gemini-3.6-flash"}
                           </span>
                         ) : (
                           <span className="text-slate-400 text-[11px]">Chưa tạo Agent</span>

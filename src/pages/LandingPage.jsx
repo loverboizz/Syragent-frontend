@@ -136,7 +136,7 @@ const FEATURES = [
   { icon: Plug, color: "from-emerald-400 to-teal-500", bg: "bg-emerald-500/10 border-emerald-500/20", title: "Nhúng Website Trong 30 Giây", desc: "Dán 1 dòng <script> vào bất kỳ website nào. Hỗ trợ WordPress, React, HTML thuần." },
   { icon: Palette, color: "from-pink-500 to-rose-500", bg: "bg-pink-500/10 border-pink-500/20", title: "Tùy Biến Giao Diện Hoàn Toàn", desc: "Đổi màu sắc, avatar, lời chào, câu hỏi mẫu theo nhận diện thương hiệu của bạn." },
   { icon: MessageSquare, color: "from-sky-400 to-cyan-500", bg: "bg-sky-500/10 border-sky-500/20", title: "Ghi Nhớ Ngữ Cảnh & Khách Quen", desc: "Tự động khôi phục lịch sử hội thoại khi khách quay lại, AI hiểu trọn vẹn mạch đàm thoại." },
-  { icon: Key, color: "from-indigo-400 to-blue-500", bg: "bg-indigo-500/10 border-indigo-500/20", title: "Linh Hoạt API Key (BYOK)", desc: "Gói miễn phí với Gemini Flash tích hợp sẵn hoặc kết nối API Key riêng của OpenAI, Google." },
+  { icon: Shield, color: "from-indigo-400 to-blue-500", bg: "bg-indigo-500/10 border-indigo-500/20", title: "Hạ Tầng Đa Mô Hình Tập Trung", desc: "Tích hợp sẵn Gemini Flash/Pro, GPT-4o, Claude 3.5 và DeepSeek trên hạ tầng bảo mật của Syragent." },
 ];
 
 function FeatureCard({ icon: Icon, color, bg, title, desc, delay = 0 }) {

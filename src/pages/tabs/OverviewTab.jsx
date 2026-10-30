@@ -37,9 +37,9 @@ export function OverviewTab({ services = [], stats = null, loading = false, onOp
         {/* Card 3 */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
           <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Gói Cước AI</p>
-            <h3 className="text-lg font-bold text-slate-800 mt-1.5">FREE & BYOK</h3>
-            <p className="text-[11px] text-amber-600 font-medium mt-0.5">Gemini 3.6 Flash / GPT-4o</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hạ Tầng AI</p>
+            <h3 className="text-lg font-bold text-slate-800 mt-1.5">Syragent AI</h3>
+            <p className="text-[11px] text-amber-600 font-medium mt-0.5">Gemini / GPT-4o / Claude / DeepSeek</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
             <Cpu className="w-6 h-6" />
@@ -113,7 +113,7 @@ export function OverviewTab({ services = [], stats = null, loading = false, onOp
               <tr>
                 <th className="px-6 py-3.5">Tên Dịch Vụ</th>
                 <th className="px-6 py-3.5">Mã Slug</th>
-                <th className="px-6 py-3.5">Gói Cước AI</th>
+                <th className="px-6 py-3.5">Mô Hình AI</th>
                 <th className="px-6 py-3.5">Trạng Thái</th>
                 <th className="px-6 py-3.5 text-right">Mã Nhúng Widget</th>
               </tr>
@@ -133,19 +133,16 @@ export function OverviewTab({ services = [], stats = null, loading = false, onOp
                 </tr>
               ) : (
                 services.slice(0, 5).map((s) => {
-                  const tier = s.agent ? s.agent.ai_tier : "Chưa có";
+                  const rawModel = s.agent?.model_name || "";
+                  const cleanModel = rawModel.replace(/^models\//, "");
                   return (
                     <tr key={s.id} className="hover:bg-slate-50/70 transition-colors">
                       <td className="px-6 py-4 font-bold text-slate-800">{s.name}</td>
                       <td className="px-6 py-4 font-mono font-bold text-sky-700">{s.code}</td>
                       <td className="px-6 py-4">
-                        {tier === "FREE" ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            FREE (Gemini Flash)
-                          </span>
-                        ) : tier === "BYOK" ? (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            BYOK ({s.agent?.model_name || "Custom"})
+                        {s.agent ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                            {cleanModel || "gemini-3.6-flash"}
                           </span>
                         ) : (
                           <span className="text-slate-400">—</span>

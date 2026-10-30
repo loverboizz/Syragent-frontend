@@ -1,16 +1,70 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Bot, Sparkles, Key, Eye, EyeOff, Save, CheckCircle2, Sliders, Shield } from "lucide-react";
+import { Bot, Sparkles, Save, CheckCircle2, Sliders, Shield, Cpu, Zap } from "lucide-react";
 import { apiRequest } from "../../api/client";
 import { useToast } from "../../context/ToastContext";
+
+export const MANAGED_MODELS = [
+  {
+    provider: "google",
+    providerLabel: "Google DeepMind",
+    modelName: "models/gemini-3.6-flash",
+    displayName: "Gemini 3.6 Flash",
+    badge: "Mặc định • Tốc độ cao",
+    badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+    description: "Tối ưu cho hội thoại RAG thời gian thực và thực thi ReAct Action Gateway với độ trễ cực thấp.",
+  },
+  {
+    provider: "google",
+    providerLabel: "Google DeepMind",
+    modelName: "models/gemini-3.1-pro-preview",
+    displayName: "Gemini 3.1 Pro",
+    badge: "Suy luận chuyên sâu",
+    badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    description: "Phân tích tài liệu kỹ thuật phức tạp, suy luận đa bước và độ chính xác ngữ nghĩa vượt trội.",
+  },
+  {
+    provider: "openai",
+    providerLabel: "OpenAI",
+    modelName: "gpt-4o-mini",
+    displayName: "GPT-4o Mini",
+    badge: "Phản hồi nhanh",
+    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    description: "Mô hình gọn nhẹ của OpenAI, phản hồi mượt mà cho các tác vụ chăm sóc khách hàng đa ngôn ngữ.",
+  },
+  {
+    provider: "openai",
+    providerLabel: "OpenAI",
+    modelName: "gpt-4o",
+    displayName: "GPT-4o Flagship",
+    badge: "Đa năng cao cấp",
+    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    description: "Mô hình flagship của OpenAI với khả năng tổng hợp thông tin và tuân thủ chỉ thị xuất sắc.",
+  },
+  {
+    provider: "anthropic",
+    providerLabel: "Anthropic",
+    modelName: "claude-3-5-sonnet-latest",
+    displayName: "Claude 3.5 Sonnet",
+    badge: "Văn phong tự nhiên",
+    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+    description: "Nổi bật với văn phong tư vấn tự nhiên, lịch sự và bám sát tuyệt đối ngữ cảnh tài liệu.",
+  },
+  {
+    provider: "deepseek",
+    providerLabel: "DeepSeek AI",
+    modelName: "deepseek-chat",
+    displayName: "DeepSeek V3",
+    badge: "Hiệu năng cao",
+    badgeColor: "bg-violet-50 text-violet-700 border-violet-200",
+    description: "Mô hình ngôn ngữ lớn thế hệ mới tối ưu cho bài toán phân tích dữ liệu và hỏi đáp nghiệp vụ.",
+  },
+];
 
 export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSaved }) {
   const [selectedServiceId, setSelectedServiceId] = useState(preselectedServiceId || (services[0]?.id || ""));
   const [agentId, setAgentId] = useState("");
-  const [aiTier, setAiTier] = useState("FREE");
   const [llmProvider, setLlmProvider] = useState("google");
   const [modelName, setModelName] = useState("models/gemini-3.6-flash");
-  const [apiKey, setApiKey] = useState("");
-  const [showKey, setShowKey] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState("");
   const [temperature, setTemperature] = useState(0.3);
   const [loading, setLoading] = useState(false);
@@ -36,16 +90,13 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
   useEffect(() => {
     if (!selectedServiceId) return;
 
-    // Check cache first for 0ms instant display
     const cached = agentCacheRef.current[selectedServiceId];
     if (cached) {
       setAgentId(cached.id || "");
-      setAiTier(cached.ai_tier || "FREE");
       setLlmProvider(cached.llm_provider || "google");
       setModelName(cached.model_name || "models/gemini-3.6-flash");
       setSystemPrompt(cached.system_prompt || "");
       setTemperature(cached.temperature !== undefined ? cached.temperature : 0.3);
-      setApiKey("");
       return;
     }
 
@@ -56,7 +107,6 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
         if (srv.agent) {
           const cfg = {
             id: srv.agent.id,
-            ai_tier: srv.agent.ai_tier || "FREE",
             llm_provider: srv.agent.llm_provider || "google",
             model_name: srv.agent.model_name || "models/gemini-3.6-flash",
             system_prompt: srv.agent.system_prompt || "",
@@ -64,16 +114,13 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
           };
           agentCacheRef.current[selectedServiceId] = cfg;
           setAgentId(cfg.id);
-          setAiTier(cfg.ai_tier);
           setLlmProvider(cfg.llm_provider);
           setModelName(cfg.model_name);
           setSystemPrompt(cfg.system_prompt);
           setTemperature(cfg.temperature);
-          setApiKey("");
         } else {
           const cfg = {
             id: "",
-            ai_tier: "FREE",
             llm_provider: "google",
             model_name: "models/gemini-3.6-flash",
             system_prompt: "",
@@ -81,12 +128,10 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
           };
           agentCacheRef.current[selectedServiceId] = cfg;
           setAgentId("");
-          setAiTier("FREE");
           setLlmProvider("google");
           setModelName("models/gemini-3.6-flash");
           setSystemPrompt("");
           setTemperature(0.3);
-          setApiKey("");
         }
       } catch (err) {
         showToast("Lỗi khi tải cấu hình Agent", "error");
@@ -98,6 +143,11 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
     loadAgentConfig();
   }, [selectedServiceId]);
 
+  const handleSelectManagedModel = (m) => {
+    setLlmProvider(m.provider);
+    setModelName(m.modelName);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedServiceId) return;
@@ -106,17 +156,10 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
     try {
       let finalAgentId = agentId;
       if (agentId) {
-        // Update existing agent
         const payload = {
-          ai_tier: aiTier,
           llm_provider: llmProvider,
           model_name: modelName,
-          system_prompt: systemPrompt,
-          temperature: parseFloat(temperature),
         };
-        if (aiTier === "BYOK" && apiKey.trim()) {
-          payload.api_key = apiKey.trim();
-        }
 
         await apiRequest(`/api/v1/agents/${agentId}`, {
           method: "PATCH",
@@ -124,18 +167,11 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
         });
         showToast("Đã lưu cập nhật Trợ lý AI thành công!", "success");
       } else {
-        // Create new agent
         const payload = {
           service_id: selectedServiceId,
-          ai_tier: aiTier,
           llm_provider: llmProvider,
           model_name: modelName,
-          system_prompt: systemPrompt,
-          temperature: parseFloat(temperature),
         };
-        if (aiTier === "BYOK" && apiKey.trim()) {
-          payload.api_key = apiKey.trim();
-        }
 
         const newAgent = await apiRequest("/api/v1/agents/", {
           method: "POST",
@@ -146,10 +182,8 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
         showToast("Đã khởi tạo Trợ lý AI thành công!", "success");
       }
 
-      // Update cache
       agentCacheRef.current[selectedServiceId] = {
         id: finalAgentId,
-        ai_tier: aiTier,
         llm_provider: llmProvider,
         model_name: modelName,
         system_prompt: systemPrompt,
@@ -167,9 +201,9 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h3 className="text-base font-bold text-slate-800">Cấu Hình Trợ Lý AI & Khóa API</h3>
+        <h3 className="text-base font-bold text-slate-800">Cấu Hình Mô Hình & Trợ Lý AI</h3>
         <p className="text-xs text-slate-500 mt-0.5">
-          Tùy chỉnh mô hình LLM, chọn gói FREE hệ thống tài trợ hoặc nhập khóa riêng (BYOK)
+          Lựa chọn mô hình ngôn ngữ lớn (LLM) được cung cấp trực tiếp bởi hạ tầng Syragent Managed AI
         </p>
       </div>
 
@@ -196,130 +230,72 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
           <div className="py-12 text-center text-xs text-slate-400">Đang tải thông số Agent...</div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* AI Tier Visual Radio Selection */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-                Gói Cước AI (Tier)
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* FREE Tier Card */}
-                <div
-                  onClick={() => setAiTier("FREE")}
-                  className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all ${aiTier === "FREE"
-                    ? "border-sky-600 bg-sky-50/40 shadow-sm"
-                    : "border-slate-200 hover:border-slate-300 bg-white"
-                    }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-sky-600" />
-                      <span>Gói Miễn Phí (FREE)</span>
-                    </span>
-                    <input
-                      type="radio"
-                      name="ai_tier"
-                      checked={aiTier === "FREE"}
-                      onChange={() => setAiTier("FREE")}
-                      className="text-sky-600 focus:ring-sky-500"
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Sử dụng Google Gemini 3.6 Flash tốc độ cao được tài trợ sẵn bởi nền tảng. Không cần thẻ tín dụng.
-                  </p>
-                </div>
-
-                {/* BYOK Tier Card */}
-                <div
-                  onClick={() => setAiTier("BYOK")}
-                  className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all ${aiTier === "BYOK"
-                    ? "border-sky-600 bg-sky-50/40 shadow-sm"
-                    : "border-slate-200 hover:border-slate-300 bg-white"
-                    }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
-                      <Key className="w-4 h-4 text-amber-600" />
-                      <span>Tự Cung Cấp Khóa (BYOK)</span>
-                    </span>
-                    <input
-                      type="radio"
-                      name="ai_tier"
-                      checked={aiTier === "BYOK"}
-                      onChange={() => setAiTier("BYOK")}
-                      className="text-sky-600 focus:ring-sky-500"
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Dùng khóa API riêng của doanh nghiệp (OpenAI GPT-4o hoặc Gemini Pro). Mã hóa AES-256 an toàn.
-                  </p>
-                </div>
+            {/* Managed AI Infrastructure Notice */}
+            <div className="p-4 rounded-xl bg-sky-50/70 border border-sky-200/80 flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                <Shield className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-800">
+                  Hạ Tầng Syragent Managed AI (Tập Trung & Bảo Mật)
+                </h4>
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                  Toàn bộ kết nối LLM, định tuyến ReAct Action Gateway và bảo mật khóa truy cập đều được quản lý trực tiếp bởi nền tảng Syragent. Doanh nghiệp chỉ cần chọn mô hình phù hợp nhất cho nghiệp vụ của mình.
+                </p>
               </div>
             </div>
 
-            {/* BYOK Specific Inputs */}
-            {aiTier === "BYOK" && (
-              <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-4 animate-in fade-in duration-150">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Nhà Cung Cấp LLM
-                    </label>
-                    <select
-                      value={llmProvider}
-                      onChange={(e) => {
-                        setLlmProvider(e.target.value);
-                        setModelName(
-                          e.target.value === "openai" ? "gpt-4o-mini" : "models/gemini-3.6-flash"
-                        );
-                      }}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-sky-500 bg-white"
+            {/* Managed Models Grid */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
+                Chọn Mô Hình Ngôn Ngữ Lớn (Syragent AI Catalog)
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {MANAGED_MODELS.map((m) => {
+                  const isSelected = modelName === m.modelName;
+                  return (
+                    <div
+                      key={m.modelName}
+                      onClick={() => handleSelectManagedModel(m)}
+                      className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        isSelected
+                          ? "border-sky-600 bg-sky-50/40 shadow-sm"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
                     >
-                      <option value="google">Google Gemini</option>
-                      <option value="openai">OpenAI</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Tên Mô Hình (Model Name)
-                    </label>
-                    <input
-                      type="text"
-                      value={modelName}
-                      onChange={(e) => setModelName(e.target.value)}
-                      placeholder={llmProvider === "openai" ? "gpt-4o hoặc gpt-4o-mini" : "models/gemini-3.6-flash"}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-sky-500 bg-white font-mono"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Khóa API Bí Mật (API Key)
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showKey ? "text" : "password"}
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      placeholder="sk-... (OpenAI) hoặc AIzaSy... (Gemini)"
-                      className="w-full pl-3.5 pr-10 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-sky-500 bg-white font-mono"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowKey(!showKey)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
-                    <Shield className="w-3 h-3 text-emerald-600 inline" />
-                    <span>Khóa được mã hóa AES-256 an toàn và chỉ giải mã trên bộ nhớ RAM khi inference.</span>
-                  </p>
-                </div>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <Cpu className={`w-4 h-4 ${isSelected ? "text-sky-600" : "text-slate-400"}`} />
+                          <div>
+                            <span className="font-bold text-xs text-slate-800 block leading-tight">
+                              {m.displayName}
+                            </span>
+                            <span className="text-[10px] font-semibold text-slate-400">
+                              {m.providerLabel}
+                            </span>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${m.badgeColor}`}>
+                          {m.badge}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 leading-relaxed mt-1">
+                        {m.description}
+                      </p>
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                        <span>{m.modelName}</span>
+                        {isSelected && (
+                          <span className="text-sky-600 font-sans font-bold inline-flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Đang chọn
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
             {/* System Prompt */}
             <div>
@@ -365,7 +341,7 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-md shadow-sky-600/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-md shadow-sky-600/20 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 <span>{saving ? "Đang lưu..." : "Lưu Cấu Hình Trợ Lý AI"}</span>
@@ -377,4 +353,3 @@ export function AgentConfigTab({ services = [], preselectedServiceId, onConfigSa
     </div>
   );
 }
-

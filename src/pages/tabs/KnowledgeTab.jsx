@@ -64,7 +64,6 @@ export function KnowledgeTab({ services = [], preselectedServiceId, onKnowledgeC
           json: {
             service_id: selectedServiceId,
             llm_provider: "google",
-            ai_tier: "FREE",
             model_name: "models/gemini-3.6-flash",
           },
         });

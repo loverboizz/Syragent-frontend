@@ -70,7 +70,7 @@ export function LoginPage({ initialRegister = false, onBack }) {
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Gói FREE Gemini Flash tích hợp sẵn hoặc dùng khóa BYOK</span>
+                <span>Hạ tầng đa mô hình (Gemini, GPT-4o, Claude, DeepSeek) tích hợp sẵn</span>
               </div>
             </div>
           </div>

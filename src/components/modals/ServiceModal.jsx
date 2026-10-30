@@ -57,14 +57,13 @@ export function ServiceModal({ isOpen, onClose, editingService, onSuccess }) {
           },
         });
 
-        // Automatically initialize default FREE Agent
+        // Automatically initialize default Managed Agent
         try {
           await apiRequest("/api/v1/agents/", {
             method: "POST",
             json: {
               service_id: newService.id,
               llm_provider: "google",
-              ai_tier: "FREE",
               model_name: "models/gemini-3.6-flash",
             },
           });

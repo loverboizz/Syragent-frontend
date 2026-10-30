@@ -180,9 +180,7 @@ export function ToolsTab({ services = [], preselectedServiceId }) {
         json: {
           service_id: selectedServiceId,
           llm_provider: "google",
-          ai_tier: "FREE",
           model_name: "models/gemini-3.6-flash",
-          system_prompt: "Bạn là trợ lý chăm sóc khách hàng thông minh.",
         },
       });
       showToast("Đã kích hoạt Trợ lý AI mặc định cho dịch vụ!", "success");
