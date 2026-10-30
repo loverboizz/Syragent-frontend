@@ -25,6 +25,84 @@ const BACKEND_BASE =
 
 const SAMPLE_TOOLS_LIST = [
   {
+    id: "lookup_syragent_account",
+    label: "lookup_syragent_account() — [Syragent] Định danh tài khoản & dịch vụ",
+    method: "GET",
+    endpoint: "/api/v1/sandbox/syragent/account-lookup",
+    sampleHint: "Tra cứu DB thật theo Email, Tên công ty hoặc Mã dịch vụ",
+    template: {
+      name: "lookup_syragent_account",
+      description:
+        "Tra cứu thông tin tài khoản doanh nghiệp trên nền tảng Syragent và danh sách các mã dịch vụ (service_code) thuộc sở hữu của người dùng theo Email hoặc Tên công ty.",
+      http_method: "GET",
+      endpoint_url: `${BACKEND_BASE}/api/v1/sandbox/syragent/account-lookup`,
+      action_type: "SYNC",
+      is_active: true,
+      parameters_schema: {
+        type: "object",
+        properties: {
+          keyword: {
+            type: "string",
+            description: "Email tài khoản, tên công ty hoặc mã dịch vụ cần tìm (VD: syragent)",
+          },
+        },
+        required: ["keyword"],
+      },
+    },
+  },
+  {
+    id: "check_syragent_service",
+    label: "check_syragent_service() — [Syragent] Chẩn đoán cấu hình AI & RAG",
+    method: "GET",
+    endpoint: "/api/v1/sandbox/syragent/diagnose/{service_code}",
+    sampleHint: "Chẩn đoán DB thật: trạng thái dịch vụ, mô hình AI, số đoạn RAG, công cụ ReAct",
+    template: {
+      name: "check_syragent_service",
+      description:
+        "Chẩn đoán kỹ thuật cho một dịch vụ trên Syragent theo service_code: kiểm tra trạng thái hoạt động, tên miền whitelist, mô hình AI, số lượng tài liệu RAG đã nạp và số lượng công cụ ReAct.",
+      http_method: "GET",
+      endpoint_url: `${BACKEND_BASE}/api/v1/sandbox/syragent/diagnose/{service_code}`,
+      action_type: "SYNC",
+      is_active: true,
+      parameters_schema: {
+        type: "object",
+        properties: {
+          service_code: {
+            type: "string",
+            description: "Mã định danh dịch vụ cần kiểm tra (VD: syragent-agent)",
+          },
+        },
+        required: ["service_code"],
+      },
+    },
+  },
+  {
+    id: "get_widget_embed_code",
+    label: "get_widget_embed_code() — [Syragent] Lấy mã nhúng Widget <script>",
+    method: "GET",
+    endpoint: "/api/v1/sandbox/syragent/embed-code/{service_code}",
+    sampleHint: "Sinh thẻ <script data-service='...'> chuẩn theo mã dịch vụ",
+    template: {
+      name: "get_widget_embed_code",
+      description:
+        "Lấy đoạn mã nhúng HTML <script> của Widget Chat và hướng dẫn cấu hình CORS Domain Whitelist cho dịch vụ theo service_code.",
+      http_method: "GET",
+      endpoint_url: `${BACKEND_BASE}/api/v1/sandbox/syragent/embed-code/{service_code}`,
+      action_type: "SYNC",
+      is_active: true,
+      parameters_schema: {
+        type: "object",
+        properties: {
+          service_code: {
+            type: "string",
+            description: "Mã định danh dịch vụ cần lấy mã nhúng (VD: syragent-agent)",
+          },
+        },
+        required: ["service_code"],
+      },
+    },
+  },
+  {
     id: "lookup_order",
     label: "lookup_order() — Tra cứu đơn hàng",
     method: "GET",

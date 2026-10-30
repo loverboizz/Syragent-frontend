@@ -40,6 +40,10 @@ export function ToolTestModal({ isOpen, onClose, serviceId, tool }) {
           initial[key] = "Sản phẩm bị lỗi màn hình, yêu cầu kiểm tra đổi mới";
         } else if (lowerKey.includes("phone")) {
           initial[key] = "0901234567";
+        } else if (lowerKey.includes("service_code")) {
+          initial[key] = "syragent-agent";
+        } else if (lowerKey.includes("keyword")) {
+          initial[key] = "syragent";
         } else {
           initial[key] = "";
         }
@@ -64,6 +68,12 @@ export function ToolTestModal({ isOpen, onClose, serviceId, tool }) {
     }
     if (lowerKey.includes("phone")) {
       return ["0901234567", "0912345678", "0987654321"];
+    }
+    if (lowerKey.includes("service_code")) {
+      return ["syragent-agent"];
+    }
+    if (lowerKey.includes("keyword")) {
+      return ["syragent", "admin"];
     }
     return [];
   };
